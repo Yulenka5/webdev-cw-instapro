@@ -61,3 +61,4 @@ export function renderUserPostsPageComponent({ appEl }) {
       element: document.querySelector(".header-container")
     });
   }
+  // 
