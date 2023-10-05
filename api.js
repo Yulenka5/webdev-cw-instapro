@@ -4,6 +4,8 @@ const personalKey = "prod";
 const baseHost = "https://webdev-hw-api.vercel.app";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
 
+
+
 export function getPosts({ token }) {
   return fetch(postsHost, {
     method: "GET",
@@ -56,6 +58,51 @@ export function loginUser({ login, password }) {
   });
 }
 
+export function addPost({ token, description, imageUrl }) {
+  return fetch(postsHost, {
+    method: "POST",
+    body: JSON.stringify({
+      description,
+      imageUrl,
+    }),
+    headers: {
+      Authorization: token,
+    }
+  }).then((response) => {
+    if (response.status === 201) {
+      return response.json();
+    } else if (response.status === 400) {
+      throw new Error(
+        "Что-то пошло не так. Проверьте данные и попробуйте снова."
+      );
+    } else {
+      throw new Error(
+        "Произошла ошибка при загрузке поста. Пожалуйста, попробуйте позже."
+      );
+    }
+  })
+  .catch((error) => {
+    alert("Произошла ошибка:", error);
+    throw error;
+  });
+}
+
+export function getPostsUser({token, userId }) {
+  return fetch(postsHost + `/user-posts/${userId}`, {
+    method: "Get",
+    headers: {
+      Authorization: token,
+    },
+  }).then((response) => {
+    if (response.status === 401) {
+      throw new Error("Нет авторизации");
+    }
+    return response.json();
+  }).then((data) => {
+return data.posts;
+  });
+}
+
 // Загружает картинку в облако, возвращает url загруженной картинки
 export function uploadImage({ file }) {
   const data = new FormData();
@@ -67,4 +114,42 @@ export function uploadImage({ file }) {
   }).then((response) => {
     return response.json();
   });
+}
+
+export function postLikesAdd({ token, ID }) {
+  return fetch(postsHost + `/${ID}/like`, {
+    method: "POST",
+    headers: {
+      Authorization: token
+    }
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        throw new Error("Нет авторизации");
+      } else if (response.status === 201) {
+        return response.json();
+      }
+    })
+    .catch((error) => {
+      alert("Необхадима авторизация");
+    });
+}
+
+export function postLikesRemove({ token, ID }) {
+  return fetch(postsHost + `/${ID}/dislike`, {
+    method: "POST",
+    headers: {
+      Authorization: token
+    }
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        throw new Error("Нет авторизации");
+      } else if (response.status === 201) {
+        return response.json();
+      }
+    })
+    .catch((error) => {
+      alert("Необхадима авторизация");
+    });
 }
