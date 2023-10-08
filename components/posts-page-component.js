@@ -31,6 +31,7 @@ const appHtml = posts.map((post)=> {
     addSuffix: true,
     locale: ru
   });
+  // const formattedDate = post.createdAt;
   /**
    * TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
    * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow

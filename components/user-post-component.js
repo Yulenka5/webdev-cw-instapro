@@ -7,10 +7,11 @@ import { ru } from "date-fns/locale";
 export function renderUserPostsPageComponent({ appEl }) {
     const userPostsHtml = posts
       .map((post) => {
-        const formattedDate = formatDistanceToNow(new Date(posts.createdAt), {
+        const formattedDate = formatDistanceToNow(new Date(post.createdAt), {
           addSuffix: true,
           locale: ru
         });
+        // const formattedDate = post.createdAt;
         return `
       <ul class="posts">
         <li class="post">
@@ -61,4 +62,4 @@ export function renderUserPostsPageComponent({ appEl }) {
       element: document.querySelector(".header-container")
     });
   }
-  // 
+  

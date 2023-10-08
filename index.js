@@ -35,6 +35,7 @@ export const logout = () => {
 /**
  * Включает страницу приложения
  */
+
 export const goToPage = (newPage, data) => {
   if (
     [
@@ -69,17 +70,19 @@ export const goToPage = (newPage, data) => {
 
     if (newPage === USER_POSTS_PAGE) {
       // TODO: реализовать получение постов юзера из API
-      page = LOADING_PAGE;
-      renderApp();
+      // page = LOADING_PAGE;
+      // renderApp();
       console.log("Открываю страницу пользователя: ", data.userId);
       const userId = data.userId;
       return getPostsUser({ userId, token: getToken()})
         .then((newPosts) => {
+          console.log("ghbdyn");
           page = USER_POSTS_PAGE;
           posts = newPosts;
           renderApp();
         })
         .catch((error) => {
+          console.log("object");
           console.error(error.message);
           goToPage(USER_POSTS_PAGE);
         });
@@ -96,6 +99,7 @@ export const goToPage = (newPage, data) => {
 
 const renderApp = () => {
   const appEl = document.getElementById("app");
+  console.log("hfjdk");
   if (page === LOADING_PAGE) {
     return renderLoadingPageComponent({
       appEl,
