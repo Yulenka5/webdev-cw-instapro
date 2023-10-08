@@ -35,6 +35,7 @@ export const logout = () => {
  * Включает страницу приложения
  */
 console.log("object");
+console.log("object");
 export const goToPage = (newPage, data) => {
   if (
     [
