@@ -1,6 +1,7 @@
 import { renderHeaderComponent } from "./header-component.js";
-import { posts } from "../index.js";
-import { displayLikes } from "./posts-page-component.js";
+import { posts, getToken, setPosts } from "../index.js";
+import { postLikesRemove, postLikesAdd, getPosts } from "../api.js";
+import { displayLikes, renderPostsPageComponent } from "./posts-page-component.js";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 
@@ -60,5 +61,28 @@ export function renderUserPostsPageComponent({ appEl }) {
     renderHeaderComponent({
       element: document.querySelector(".header-container")
     });
-  }
+
+    document.querySelectorAll(".like-button").forEach((likeBtn) => {
+      likeBtn.addEventListener("click", async () => {
+        const id = likeBtn.dataset.postId;
+        const isLiked = likeBtn.dataset.postLike === "true";
+        try {
+  
+          const token = getToken();
+  
+          if (isLiked) {
+            await postLikesRemove({ token, ID: id })
+          } else {
+            await postLikesAdd({ token, ID: id })
+          }
+          getPosts({token: getToken()}).then((res)=> {
+            setPosts(res)
+            renderPostsPageComponent({appEl})
+          })
+        } catch (error) {
+          console.error("Произошла ошибка:", error);
+        }
+      });
+  })
+}
   

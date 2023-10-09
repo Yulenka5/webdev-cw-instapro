@@ -1,9 +1,9 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage, getToken } from "../index.js";
-import { postLikesRemove, postLikesAdd } from "../api.js";
+import { posts, goToPage, getToken, setPosts } from "../index.js";
+import { postLikesRemove, postLikesAdd, getPosts } from "../api.js";
 import { formatDistanceToNow } from "date-fns";
-import { el, id, ru } from "date-fns/locale";
+import { ru } from "date-fns/locale";
 
 
 
@@ -31,7 +31,7 @@ const appHtml = posts.map((post)=> {
     addSuffix: true,
     locale: ru
   });
-
+  // const formattedDate = post.createdAt;
   /**
    * TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
    * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
@@ -92,13 +92,13 @@ const appHtml = posts.map((post)=> {
 
         if (isLiked) {
           await postLikesRemove({ token, ID: id })
-            goToPage(POSTS_PAGE);
         } else {
           await postLikesAdd({ token, ID: id })
-            goToPage(POSTS_PAGE);
-          
         }
-        goToPage(undefined, "like");
+        getPosts({token: getToken()}).then((res)=> {
+          setPosts(res)
+          renderPostsPageComponent({appEl})
+        })
       } catch (error) {
         console.error("Произошла ошибка:", error);
       }

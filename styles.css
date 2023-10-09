@@ -119,15 +119,15 @@
 }
 
 .posts-user-header__user-image {
-  width: 70px;
-  height: 70px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
   border-radius: 40px;
   margin-right: 10px;
 }
 
 .posts-user-header__user-name {
-  font-size: 28px;
+  /* font-size: 28px; */
   line-height: 35px;
 }
 
