@@ -43,7 +43,7 @@ onImageUrlChange(newImgUrl) {
       const textareaElement = document.querySelector(".add-form-text");
 
       onAddPostClick({
-        description: textareaElement.value,
+        description: textareaElement.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),        
         imageUrl,
       });
     });

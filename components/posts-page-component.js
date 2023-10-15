@@ -5,8 +5,6 @@ import { postLikesRemove, postLikesAdd, getPosts } from "../api.js";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 
-
-
 export const displayLikes = (likes) => {
   const numberOfLikes = likes.length;
 
@@ -22,36 +20,42 @@ export const displayLikes = (likes) => {
 };
 
 export function renderPostsPageComponent({ appEl }) {
- 
   console.log("Актуальный список постов:", posts);
- 
-const appHtml = posts.map((post)=> {
 
-  const formattedDate = formatDistanceToNow(new Date(post.createdAt), {
-    addSuffix: true,
-    locale: ru
-  });
-  // const formattedDate = post.createdAt;
-  /**
-   * TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
-   * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
-   */
-   
- return  `<div class="page-container">
+  const appHtml = posts
+    .map((post) => {
+      const formattedDate = formatDistanceToNow(new Date(post.createdAt), {
+        addSuffix: true,
+        locale: ru,
+      });
+      // const formattedDate = post.createdAt;
+      /**
+       * TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
+       * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
+       */
+
+      return `<div class="page-container">
                 <div class="header-container"></div>
                 <ul class="posts">
                   <li class="post">
                     <div class="post-header" data-user-id='${post.user.id}'>
-                        <img src='${post.user.imageUrl}' class="post-header__user-image">
+                        <img src='${
+                          post.user.imageUrl
+                        }' class="post-header__user-image">
                         <p class="post-header__user-name">${post.user.name}</p>
                     </div>
                     <div class="post-image-container">
                       <img class="post-image" src='${post.imageUrl}'>
                     </div>
                     <div class="post-likes">
-                      <button data-post-id='${post.id}' data-post-like=${post.isLiked} class="like-button">
-                        ${post.isLiked ? `<img src="./assets/images/like-active.svg">` :
-                        `<img src="./assets/images/like-not-active.svg">`}
+                      <button data-post-id='${post.id}' data-post-like=${
+        post.isLiked
+      } class="like-button">
+                        ${
+                          post.isLiked
+                            ? `<img src="./assets/images/like-active.svg">`
+                            : `<img src="./assets/images/like-not-active.svg">`
+                        }
                       </button>
                       <p class="post-likes-text">
                         Нравится: <strong>${displayLikes(post.likes)}</strong>
@@ -66,7 +70,9 @@ const appHtml = posts.map((post)=> {
                     </p>
                   </li>
                 </ul>
-              </div>`;}).join("");
+              </div>`;
+    })
+    .join("");
 
   appEl.innerHTML = appHtml;
 
@@ -82,27 +88,21 @@ const appHtml = posts.map((post)=> {
     });
   }
 
-  document.querySelectorAll(".like-button").forEach((likeBtn) => {
-    likeBtn.addEventListener("click", async () => {
+  for (let likeBtn of document.querySelectorAll(".like-button")) {
+    likeBtn.addEventListener("click", () => {
       const id = likeBtn.dataset.postId;
       const isLiked = likeBtn.dataset.postLike === "true";
-      try {
+      const token = getToken();
 
-        const token = getToken();
-
-        if (isLiked) {
-          await postLikesRemove({ token, ID: id })
-        } else {
-          await postLikesAdd({ token, ID: id })
-        }
-        getPosts({token: getToken()}).then((res)=> {
-          setPosts(res)
-          renderPostsPageComponent({appEl})
-        })
-      } catch (error) {
-        console.error("Произошла ошибка:", error);
+      if (!isLiked) {
+        postLikesAdd({ token, ID: id }).then(() => {
+          return goToPage(POSTS_PAGE);
+        });
+      } else {
+        postLikesRemove({ token, ID: id }).then(() => {
+          return goToPage(POSTS_PAGE);
+        });
       }
     });
-  });
+  }
 }
-

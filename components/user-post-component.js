@@ -1,18 +1,19 @@
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, getToken, setPosts } from "../index.js";
-import { postLikesRemove, postLikesAdd, getPosts } from "../api.js";
-import { displayLikes, renderPostsPageComponent } from "./posts-page-component.js";
+import { posts, getToken, goToPage } from "../index.js";
+import { postLikesRemove, postLikesAdd} from "../api.js";
+import { displayLikes} from "./posts-page-component.js";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
+import { USER_POSTS_PAGE } from "../routes.js";
 
 export function renderUserPostsPageComponent({ appEl }) {
-    const userPostsHtml = posts
-      .map((post) => {
-        const formattedDate = formatDistanceToNow(new Date(post.createdAt), {
-          addSuffix: true,
-          locale: ru
-        });
-        return `
+  const userPostsHtml = posts
+    .map((post) => {
+      const formattedDate = formatDistanceToNow(new Date(post.createdAt), {
+        addSuffix: true,
+        locale: ru,
+      });
+      return `
       <ul class="posts">
         <li class="post">
           <div class="post-header" data-user-id="${post.user.id}">
@@ -46,43 +47,40 @@ export function renderUserPostsPageComponent({ appEl }) {
         </li>
       </ul>
     `;
-      })
-      .join("");
-  
-    const postPageHtml = `
+    })
+    .join("");
+
+  const postPageHtml = `
       <div class="page-container" >
       <div class="header-container"></div>
       ${userPostsHtml}
       </div>
       `;
-  
-    appEl.innerHTML = postPageHtml;
-  
-    renderHeaderComponent({
-      element: document.querySelector(".header-container")
-    });
 
-    document.querySelectorAll(".like-button").forEach((likeBtn) => {
-      likeBtn.addEventListener("click", async () => {
-        const id = likeBtn.dataset.postId;
-        const isLiked = likeBtn.dataset.postLike === "true";
-        try {
-  
-          const token = getToken();
-  
-          if (isLiked) {
-            await postLikesRemove({ token, ID: id })
-          } else {
-            await postLikesAdd({ token, ID: id })
-          }
-          getPosts({token: getToken()}).then((res)=> {
-            setPosts(res)
-            renderPostsPageComponent({appEl})
-          })
-        } catch (error) {
-          console.error("Произошла ошибка:", error);
-        }
-      });
-  })
+  appEl.innerHTML = postPageHtml;
+
+  renderHeaderComponent({
+    element: document.querySelector(".header-container"),
+  });
+
+  const userEl = document.querySelector(".post-header");
+
+  for (let likeBtn of document.querySelectorAll(".like-button")) {
+    likeBtn.addEventListener("click", () => {
+      const userId = userEl.dataset.userId;
+      const id = likeBtn.dataset.postId;
+      const isLiked = likeBtn.dataset.postLike === "true";
+      const token = getToken();
+
+      if (!isLiked) {
+        postLikesAdd({ token, ID: id }).then(() => {
+          return goToPage(USER_POSTS_PAGE, { userId });
+        });
+      } else {
+        postLikesRemove({ token, ID: id }).then(() => {
+          return goToPage(USER_POSTS_PAGE, { userId });
+        });
+      }
+    });
+  }
 }
-  
